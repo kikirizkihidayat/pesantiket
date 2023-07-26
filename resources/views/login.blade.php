@@ -75,7 +75,7 @@
 <main class="form-signin w-100 m-auto">
   <form action="/login" method="post">
     @csrf
-    <h1 class="h3 mb-3 fw-normal">Masuk psnTiket</h1>
+    <h1 class="h3 mb-3 fw-normal">Login psnTiket</h1>
       @if(session()->has('loginError'))
       <div class="alert alert-danger alert-dismissible fade show" role="alert">
         {{ session('loginError') }}
