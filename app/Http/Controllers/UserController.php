@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -11,6 +12,13 @@ class UserController extends Controller
     {
         return view('content.users.users', [
             'title' => 'Pengguna'
+        ]);
+    }
+
+    public function profile()
+    {
+        return view('content.users.profile', [
+            'title' => 'Profile'
         ]);
     }
 
@@ -48,12 +56,30 @@ class UserController extends Controller
 
     public function updateUser()
     {
-        User::where('id', request('id'))->update([
-            'name' => request('name'),
-            'email' => request('email'),
-            'alamat' => request('alamat'),
-            'level' => request('level')
-        ]);
+        if (request('password')) {
+            $newPassword = bcrypt(request('newPassword'));            
+            $credentials = request()->validate([
+                'email' => 'required|email',
+                'password' => 'required'
+            ]);
+
+            if (Auth::attempt($credentials)) {
+                User::where('id', request('id'))->update([
+                    'password' => $newPassword
+                ]);
+                return response()->json(['success' => true]);
+            }else{
+                return response()->json(['success' => false]);
+            }
+            
+        }else{
+            User::where('id', request('id'))->update([
+                'name' => request('name'),
+                'email' => request('email'),
+                'alamat' => request('alamat'),
+                'level' => request('level')
+            ]);
+        }
     }
 
 

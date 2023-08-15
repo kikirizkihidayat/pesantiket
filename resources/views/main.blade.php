@@ -35,6 +35,7 @@
 <body id="page-top">
     <!-- Page Wrapper -->
     <div id="wrapper">
+        <input type="text" id="sessionId" value="{{ session('userId') }}" hidden>
 
         <!-- Sidebar -->
         @include('partials.navbar')
@@ -92,7 +93,6 @@
             </div>
         </div>
     </div>
-	
 
     <!-- Bootstrap core JavaScript-->
     <script src="vendor/jquery/jquery.min.js"></script>

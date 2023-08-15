@@ -7,7 +7,7 @@
   <!-- Page Heading -->
   <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom-secondary">
     <h1 class="h3 mb-0 text-gray-800"> {{ $title }}</h1>
-    <div class="btn-toolbar mb-2 mb-md-0">
+    <div v-if="sessionLevel" class="btn-toolbar mb-2 mb-md-0">
       <a href="#" class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#modalChekIn">
         <i class="fas fa-user-plus fa-sm "></i> Tambah Pengguna
       </a>
@@ -55,7 +55,7 @@
           <td>@{{ item.alamat }}</td>
           <td>@{{ item.level }}</td>
           <td>
-            <div class="dropdown no-arrow">
+            <div v-if="sessionLevel" class="dropdown no-arrow">
                 <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
@@ -110,9 +110,8 @@
                   <div class="form-group col-md-6">
                     <select class="form-control form-control-sm" v-model="level" :class="[activeClassLevel]">
                       <option value="">Pilih Level</option>
-                      <option value="admin">Admin</option>
-                      <option value="user">User</option>
-                      <option value="do">DO</option>
+                      <option value="Admin">Admin</option>
+                      <option value="User">user</option>
                     </select>
                   </div>
                 </div>
@@ -147,6 +146,9 @@
     
     data() {
       return {
+      dataSession : [],
+      sessionLevel : '',
+
       url : '',
       data_users : [],
       from : '',
@@ -188,6 +190,22 @@
       this.show = 10;
       this.url = "master-users";
       this.getData();
+      axios.get('master-user', {
+        params : {
+          id : $('#sessionId').val()
+        }
+      }).then(resp => {
+        this.dataSession = resp.data[0];
+        if (this.dataSession['level']=="Admin") {
+          this.sessionLevel = true;
+        }else{this.sessionLevel = false;}
+        
+      }).catch(err => {          
+        swal('Gangguan sistem!',{
+            icon: "warning",
+          });
+      });
+      
     },
     methods: {
       getData() {

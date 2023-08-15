@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use PharIo\Manifest\Email;
 use Illuminate\Support\Facades\Auth;
@@ -21,6 +22,11 @@ class loginController extends Controller
         ]);
 
         if (Auth::attempt($credentials)) {
+            $data = User::Where('email',request('email'))->get();
+            $r = $data[0];
+            $request->session()->put('name',$r['name']);
+            $request->session()->put('userId',$r['id']);
+            $request->session()->put('role',$r['level']);
             $request->session()->regenerate();
             return redirect()->intended('/dashboard');
         }

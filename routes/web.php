@@ -43,3 +43,4 @@ Route::get('master-user', [UserController::class, 'getUser']);
 Route::post('master-user-save', [UserController::class, 'postUser']);
 Route::post('master-user-update', [UserController::class, 'updateUser']);
 Route::get('master-user-delete', [UserController::class, 'deleteUser']);
+Route::get('/profile', [UserController::class, 'profile'])->middleware('auth');
