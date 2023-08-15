@@ -23,7 +23,7 @@ class TiketController extends Controller
         $show = request('show');
         $search = request('search');
         if (request('search')) {
-            $data = Tiket::where('nama', 'like', '%' . $search . '%')->paginate($show);
+            $data = Tiket::where('idTiket', 'like', '%' . $search . '%')->orWhere('nama', 'like', '%' . $search . '%')->orWhere('email', 'like', '%' . $search . '%')->orWhere('nomer_hp', 'like', '%' . $search . '%')->orWhere('alamat', 'like', '%' . $search . '%')->paginate($show);
         } else {
             $data = Tiket::paginate($show);
         }
