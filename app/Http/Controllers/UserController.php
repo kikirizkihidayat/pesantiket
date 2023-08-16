@@ -27,7 +27,7 @@ class UserController extends Controller
         $show = request('show');
         $search = request('search');
         if ($search) {
-            $data = User::where('nama', 'like', '%' . $search . '%')->paginate($show);
+            $data = User::where('id', 'like', '%' . $search . '%')->orWhere('name', 'like', '%' . $search . '%')->orWhere('email', 'like', '%' . $search . '%')->orWhere('alamat', 'like', '%' . $search . '%')->orWhere('level', 'like', '%' . $search . '%')->paginate($show);
         } else {
             $data = User::paginate($show);
         }
