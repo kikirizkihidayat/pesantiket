@@ -62,6 +62,7 @@
                 </a>
                 <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
                   aria-labelledby="dropdownMenuLink">
+                  <a class="dropdown-item" href="#" data-toggle="modal" data-target="#modalResetPassword"><i class="fas fa-key">&nbsp;</i>Reset Password</a>
                   <a class="dropdown-item" href="#" v-on:click="bttnEdit(item.id)" data-toggle="modal" data-target="#modalChekIn"><i class="fas fa-edit">&nbsp;</i>Edit</a>
                   <a class="dropdown-item" href="#" v-on:click="btnDelete(item.id,item.name)"><i class="fas fa-trash-alt">&nbsp;</i>Delete</a>
                 </div>
@@ -135,6 +136,36 @@
     </div>
   </div>
 
+  
+  <!--Modal Reset Password-->
+  <div class="modal fade" id="modalResetPassword" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Yakin anda ingin mereset password @{{ name }}?</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+              Silahkan masukan password anda untuk melanjutkan!
+                <input type="email" name="email" hidden>
+                <input type="email" name="emailReset" hidden>
+                <input type="password" class="form-control form-control-sm" placeholder="Masukan Password" required >
+                        
+            </div>
+            <div class="modal-footer">
+                <form action="/logout" method="POST">
+                    @csrf
+                    <button type="button" class="btn-sm btn btn-primary ms-3"  v-on:click="btnUpdate()"><i class="fa fa-key fa-sm"></i> Reset Password</button>
+                    
+                    <button type="button" class="btn-sm btn btn-danger" v-on:click="btnClose()"  data-dismiss="modal" aria-label="Close">Cancel</button>
+                  
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 </div>
 
@@ -364,6 +395,42 @@
               icon: "warning",
             });
           })
+          }
+        });
+      },
+      bttnResetPassword(id,name){
+        swal({
+          title: "Anda akan mereset password "+name+"!",
+          text: "",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+          title: 'Enter your password',
+  input: 'password',
+  inputLabel: 'Password',
+  inputPlaceholder: 'Enter your password',
+  inputAttributes: {
+    maxlength: 10,
+    autocapitalize: 'off',
+    autocorrect: 'off'
+  }
+        })
+        .then((willDelete) => {
+          if (willDelete) {
+            axios.get('master-user-delete', {
+            params : {
+              id : id
+            }
+            }).then(resp => {
+              this.getData();
+              swal("Data berhasil dihapus!", {
+                icon: "success",
+              });
+            }).catch(err => {
+              swal('Gagal menghapus data!',{
+                icon: "warning",
+              });
+            })
           }
         });
       },

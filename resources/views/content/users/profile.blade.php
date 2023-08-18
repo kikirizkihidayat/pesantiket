@@ -138,7 +138,6 @@
     data() {
       return {
       url : '',
-      data_users : [],
       from : '',
       to : '',
       total : '',
