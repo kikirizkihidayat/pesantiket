@@ -214,6 +214,7 @@
         }
       },
       btnSave(){
+        this.activeClasspassword = this.activeClassnewPassword = this.activeClassrePassword = '';        
         if (this.password == '') {
           this.activeClasspassword = 'is-invalid';
           $('#password').focus();
@@ -232,7 +233,6 @@
           form_data.append('newPassword' , this.newPassword);
           axios.post('master-user-update', form_data)
           .then(resp => {
-            console.log(resp);
             if (resp.data.success) {
               swal({
                 title: 'Ganti Password',
@@ -246,8 +246,8 @@
                 location.href='/profile';
               })              
             }else{
-              $('#Password').focus();
-              $('#Password').select();
+              $('#password').focus();
+              $('#password').select();
               $('#errorPassword').prop('hidden',false);
               this.activeClasspassword = 'is-invalid';
             }

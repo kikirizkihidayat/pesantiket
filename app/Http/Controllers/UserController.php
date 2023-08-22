@@ -82,6 +82,24 @@ class UserController extends Controller
         }
     }
 
+    public function resetPassword()
+    {
+        $newPassword = bcrypt(request('emailReset'));            
+        $credentials = request()->validate([
+            'email' => 'required|email',
+            'password' => 'required'
+        ]);
+
+        if (Auth::attempt($credentials)) {
+            User::where('email', request('emailReset'))->update([
+                'password' => $newPassword
+            ]);
+            return response()->json(['success' => true]);
+        }else{
+            return response()->json(['success' => false]);
+        }
+    }
+
 
     public function deleteUser()
     {

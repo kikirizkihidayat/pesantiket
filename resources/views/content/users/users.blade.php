@@ -62,7 +62,7 @@
                 </a>
                 <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
                   aria-labelledby="dropdownMenuLink">
-                  <a class="dropdown-item" href="#" data-toggle="modal" data-target="#modalResetPassword"><i class="fas fa-key">&nbsp;</i>Reset Password</a>
+                  <a class="dropdown-item" href="#" v-if="item.email!=sessionEmail" v-on:click="btnResetPassword(item.email)" data-toggle="modal" data-target="#modalResetPassword"><i class="fas fa-key">&nbsp;</i>Reset Password</a>
                   <a class="dropdown-item" href="#" v-on:click="bttnEdit(item.id)" data-toggle="modal" data-target="#modalChekIn"><i class="fas fa-edit">&nbsp;</i>Edit</a>
                   <a class="dropdown-item" href="#" v-on:click="btnDelete(item.id,item.name)"><i class="fas fa-trash-alt">&nbsp;</i>Delete</a>
                 </div>
@@ -142,22 +142,24 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Yakin anda ingin mereset password @{{ name }}?</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Yakin anda ingin mereset password?</h5>
                 <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
             </div>
             <div class="modal-body">
               Silahkan masukan password anda untuk melanjutkan!
-                <input type="email" name="email" hidden>
-                <input type="email" name="emailReset" hidden>
-                <input type="password" class="form-control form-control-sm" placeholder="Masukan Password" required >
-                        
+                <input type="email" v-model="email" hidden>
+                <input type="email" v-model="emailReset" hidden>
+                <input type="password" id="password" v-model="password" class="form-control form-control-sm" :class="[activeClassPassword]" placeholder="Masukan Password" required >
+                <div class="invalid-feedback">
+                  @{{ errorPassword }}
+                </div>
             </div>
             <div class="modal-footer">
                 <form action="/logout" method="POST">
                     @csrf
-                    <button type="button" class="btn-sm btn btn-primary ms-3"  v-on:click="btnUpdate()"><i class="fa fa-key fa-sm"></i> Reset Password</button>
+                    <button type="button" class="btn-sm btn btn-primary ms-3"  v-on:click="bttnResetPassword()"><i class="fa fa-key fa-sm"></i> Reset Password</button>
                     
                     <button type="button" class="btn-sm btn btn-danger" v-on:click="btnClose()"  data-dismiss="modal" aria-label="Close">Cancel</button>
                   
@@ -179,6 +181,7 @@
       return {
       dataSession : [],
       sessionLevel : '',
+      sessionEmail : '',
 
       url : '',
       data_users : [],
@@ -197,7 +200,7 @@
       isActivePage : true,
       hasErorrPage : false,
 
-      idTiket : '',
+      emailReset : '',
       classChekIn : 'disabled',
       classValid : 'hidden',
       dataUser : [],
@@ -206,11 +209,14 @@
       email : '',
       level : '',
       alamat : '',
+      password : '',
       
+      errorPassword : '',
       activeClassName : '',
       activeClassEmail : '',
       activeClassLevel : '',
       activeClassAlamat : '',
+      activeClassPassword : '',
       
       btnEdit : false
 
@@ -227,6 +233,7 @@
         }
       }).then(resp => {
         this.dataSession = resp.data[0];
+        this.sessionEmail = this.dataSession['email'];
         if (this.dataSession['level']=="Admin") {
           this.sessionLevel = true;
         }else{this.sessionLevel = false;}
@@ -398,41 +405,44 @@
           }
         });
       },
-      bttnResetPassword(id,name){
-        swal({
-          title: "Anda akan mereset password "+name+"!",
-          text: "",
-          icon: "warning",
-          buttons: true,
-          dangerMode: true,
-          title: 'Enter your password',
-  input: 'password',
-  inputLabel: 'Password',
-  inputPlaceholder: 'Enter your password',
-  inputAttributes: {
-    maxlength: 10,
-    autocapitalize: 'off',
-    autocorrect: 'off'
-  }
-        })
-        .then((willDelete) => {
-          if (willDelete) {
-            axios.get('master-user-delete', {
-            params : {
-              id : id
-            }
-            }).then(resp => {
-              this.getData();
-              swal("Data berhasil dihapus!", {
-                icon: "success",
-              });
-            }).catch(err => {
-              swal('Gagal menghapus data!',{
-                icon: "warning",
-              });
-            })
-          }
-        });
+      btnResetPassword(email){
+        this.email = this.sessionEmail;
+        this.emailReset = email;
+
+      },
+      bttnResetPassword(){
+        if (this.password == '') {
+          this.activeClassPassword = 'is-invalid';
+        }else{
+          var form_data = new FormData();
+          form_data.append('emailReset', this.emailReset);
+          form_data.append('email', this.email);
+          form_data.append('password', this.password);
+          axios.post('master-user-resetPassword', form_data)
+          .then(resp => {
+            if (resp.data.success) {
+              swal({
+                title: 'Reset Password',
+                text: 'Password berhasil direset.',
+                icon: 'success',
+                timer: 2000,
+                buttons: false,
+              })
+              .then(() => {
+                  location.href='/users';
+              })
+            }else{
+              $('#password').focus();
+              $('#password').select();
+              this.activeClassPassword = 'is-invalid';
+              this.errorPassword = "Password tidak sesuai, periksa kembali!";
+            }            
+          })
+          .catch(err => {
+            swal("Gagal memproses!","","warning");
+            console.log(form_data);
+          })
+        }
       },
       btnClose(){
         this.id = '';
